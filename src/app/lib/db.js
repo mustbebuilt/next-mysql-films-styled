@@ -33,8 +33,6 @@ const fetchLatestFilms = async () => {
     const [rows] = await db.execute(query);
     db.release();
     return rows;
-
-
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Failed to fetch latest data.");
@@ -65,7 +63,6 @@ const fetchFilm = async (film_id) => {
 };
 
 const searchFilms = async (searchTerm) => {
-  // Prevent the response from being cached.
   noStore();
   let db;
   try {
@@ -78,22 +75,22 @@ const searchFilms = async (searchTerm) => {
          OR film_description LIKE ?
       ORDER BY film_release_date DESC
     `;
-    const [rows] = await db.execute(query, [searchPattern, searchPattern, searchPattern]);
-    if (rows.length === 0) {
-      throw new Error("No films found");
-    }
-    return rows; // Return all matching results
+    const [rows] = await db.execute(query, [
+      searchPattern,
+      searchPattern,
+      searchPattern,
+    ]);
+
+    return rows; // ✅ Can safely be an empty array
   } catch (error) {
     console.error("Database Error:", error);
-    throw new Error("Failed to fetch film data.");
+    throw new Error("Failed to fetch film data."); // only real DB errors
   } finally {
     if (db) {
-      db.release(); // Ensure the connection is released
+      db.release();
     }
   }
 };
-
-
 
 const randomFilm = async () => {
   try {
@@ -108,6 +105,4 @@ const randomFilm = async () => {
   }
 };
 
-
-
-export { fetchFilms, fetchLatestFilms, fetchFilm ,searchFilms, randomFilm };
+export { fetchFilms, fetchLatestFilms, fetchFilm, searchFilms, randomFilm };
